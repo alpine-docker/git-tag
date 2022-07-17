@@ -32,18 +32,20 @@ echo -e "\tTAG_CONTEXT: ${tag_context}"
 echo -e "\tPRERELEASE_SUFFIX: ${suffix}"
 echo -e "\tVERBOSE: ${verbose}"
 
-current_branch=$(git rev-parse --abbrev-ref HEAD)
+#current_branch=$(git rev-parse --abbrev-ref HEAD)
+#current_branch=$(git branch --show-current)
 
-pre_release="true"
-IFS=',' read -ra branch <<< "$release_branches"
-for b in "${branch[@]}"; do
-    echo "Is $b a match for ${current_branch}"
-    if [[ "${current_branch}" =~ $b ]]
-    then
-        pre_release="false"
-    fi
-done
-echo "pre_release = $pre_release"
+# pre_release="true"
+# IFS=',' read -ra branch <<< "$release_branches"
+# for b in "${branch[@]}"; do
+#     echo "Is $b a match for ${current_branch}"
+#     if [[ "${current_branch}" =~ $b ]]
+#     then
+#         pre_release="false"
+#     fi
+# done
+#echo "pre_release = $pre_release"
+pre_release="false"
 
 # fetch tags
 git fetch --tags
@@ -159,3 +161,7 @@ then
 fi 
 
 echo ::set-output name=tag::$new
+
+# gitlab: Pass an environment variable to another job
+# https://docs.gitlab.com/ee/ci/variables/index.html#pass-an-environment-variable-to-another-job
+echo "tagName=${new}" >> build.env
