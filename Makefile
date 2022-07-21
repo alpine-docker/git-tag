@@ -15,5 +15,6 @@ build: VER=$(shell git log -1 --pretty=format:"%H" |cut -c1-8 )
 build: ## usage: make build
 	@docker build -t alpine/git-tag .
 	echo $(VER)
+	@docker tag alpine/git-tag alpine/git-tag:$(VER)
 	@docker push alpine/git-tag:$(VER)
 	@docker push alpine/git-tag:latest
