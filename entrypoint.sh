@@ -48,7 +48,7 @@ echo -e "\tVERBOSE: ${verbose}"
 pre_release="false"
 
 # fetch tags
-git fetch --tags
+git fetch --tags -f
     
 tagFmt="^v?[0-9]+\.[0-9]+\.[0-9]+$" 
 preTagFmt="^v?[0-9]+\.[0-9]+\.[0-9]+(-$suffix\.[0-9]+)?$" 
