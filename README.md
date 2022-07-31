@@ -22,8 +22,8 @@ $ docker run -ti --rm -v $(pwd):/workspace -w /workspace git-tag
 ### sample for gitlab pipeline
 
 ```
-create_tag:
-  stage: release
+generate_tag:
+  stage: tag
   image: alpine/git-tag:latest
   rules:
     - if: $CI_COMMIT_TAG
@@ -32,10 +32,11 @@ create_tag:
   script:
     - echo "create tag for branch $CI_DEFAULT_BRANCH"
     - /entrypoint.sh
-    - echo $new > tag_name
+    - cat build.env
+    - echo "CI_COMMIT_REF_NAME is ${CI_COMMIT_REF_NAME}"
   artifacts:
     reports:
-      dotenv: tag_name
+      dotenv: build.env
 
 release_job:
   stage: release
