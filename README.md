@@ -19,9 +19,9 @@ $ cd <git_project>
 $ docker run -ti --rm -v $(pwd):/workspace -w /workspace git-tag
 
 ```
-
 ### sample for gitlab pipeline
 
+```
 create_tag:
   stage: release
   image: alpine/git-tag:latest
@@ -52,7 +52,7 @@ release_job:
     tag_name: 'v$tag_name'
     description: 'v$tag_name'
     ref: '$CI_COMMIT_SHA'                          # The tag is created from the pipeline SHA.
-
+```
 #### Options
 
 **Environment Variables**
