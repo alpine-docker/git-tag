@@ -50,8 +50,8 @@ release_job:
   script:
     - echo "running release_job for $TAG"
   release:                                         # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
-    tag_name: 'v$tag_name'
-    description: 'v$tag_name'
+    tag_name: '$tag_name'
+    description: '$tag_name'
     ref: '$CI_COMMIT_SHA'                          # The tag is created from the pipeline SHA.
 ```
 #### Options
