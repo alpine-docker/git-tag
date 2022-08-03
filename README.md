@@ -39,19 +39,19 @@ generate_tag:
       dotenv: build.env
 
 release_job:
-  stage: release
+  stage: tag
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  dependencies:
-    - generate_tag
+  needs: ["generate_tag"]
   rules:
     - if: $CI_COMMIT_TAG
       when: never                                  # Do not run this job when a tag is created manually
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH  # Run this job when commits are pushed or merged to the default branch
   script:
-    - echo "running release_job for $TAG"
+    - echo "running release_job for $tagName"
+    - echo "CI_COMMIT_REF_NAME is ${CI_COMMIT_REF_NAME}"
   release:                                         # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
-    tag_name: '$tag_name'
-    description: '$tag_name'
+    tag_name: '$tagName'
+    description: '$tagName'
     ref: '$CI_COMMIT_SHA'                          # The tag is created from the pipeline SHA.
 ```
 #### Options
