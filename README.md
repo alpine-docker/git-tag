@@ -42,7 +42,7 @@ release_job:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   dependencies:
-    - create_tag
+    - generate_tag
   rules:
     - if: $CI_COMMIT_TAG
       when: never                                  # Do not run this job when a tag is created manually
