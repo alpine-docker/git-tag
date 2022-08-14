@@ -95,6 +95,8 @@ commit=$(git rev-parse HEAD)
 if [ "$tag_commit" == "$commit" ]; then
     echo "No new commits since previous tag. Skipping..."
     echo ::set-output name=tag::$tag
+    echo "tagName=${tag}" >> build.env
+    echo "existTag=true" >> build.env
     exit 0
 fi
 
@@ -165,3 +167,4 @@ echo ::set-output name=tag::$new
 # gitlab: Pass an environment variable to another job
 # https://docs.gitlab.com/ee/ci/variables/index.html#pass-an-environment-variable-to-another-job
 echo "tagName=${new}" >> build.env
+echo "existTag=false" >> build.env
