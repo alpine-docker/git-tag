@@ -1,44 +1,61 @@
-# github-tag-action
+# git-tag
 
-A Github Action to automatically bump and tag master, on merge, with the latest SemVer formatted version.
+Fork from [anothrNick/github-tag-action](https://github.com/anothrNick/github-tag-action), make it generic and focus to generate the next tag name only.
 
-[![Build Status](https://github.com/anothrNick/github-tag-action/workflows/Bump%20version/badge.svg)](https://github.com/anothrNick/github-tag-action/workflows/Bump%20version/badge.svg)
-[![Stable Version](https://img.shields.io/github/v/tag/anothrNick/github-tag-action)](https://img.shields.io/github/v/tag/anothrNick/github-tag-action)
-[![Latest Release](https://img.shields.io/github/v/release/anothrNick/github-tag-action?color=%233D9970)](https://img.shields.io/github/v/release/anothrNick/github-tag-action?color=%233D9970)
+This docker image can be used in any git projects, whatever it is github, gitlab, bitbucket, azure devops, and so on.
 
-> Medium Post: [Creating A Github Action to Tag Commits](https://itnext.io/creating-a-github-action-to-tag-commits-2722f1560dec)
+## Usage
 
-[<img src="https://miro.medium.com/max/1200/1*_4Ex1uUhL93a3bHyC-TgPg.png" width="400">](https://itnext.io/creating-a-github-action-to-tag-commits-2722f1560dec)
-
-### Usage
+### Local test
 
 ```Dockerfile
-name: Bump version
-on:
-  push:
-    branches:
-      - master
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
-    - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@1.36.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: true
+$ docker build -t git-tag .
+
+$ cd <git_project>
+
+# get the next tag name
+$ docker run -ti --rm -v $(pwd):/workspace -w /workspace git-tag
+
 ```
+### sample for gitlab pipeline
 
-_NOTE: set the fetch-depth for `actions/checkout@v2` to be sure you retrieve all commits to look for the semver commit message._
+```
+generate_tag:
+  stage: tag
+  image: alpine/git-tag:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never                                  # Do not run this job when a tag is created manually
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH  # Run this job when commits are pushed or merged to the default branch
+  script:
+    - echo "create tag for branch $CI_DEFAULT_BRANCH"
+    - /entrypoint.sh
+    - cat build.env
+    - echo "CI_COMMIT_REF_NAME is ${CI_COMMIT_REF_NAME}"
+  artifacts:
+    reports:
+      dotenv: build.env
 
+release_job:
+  stage: tag
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs: ["generate_tag"]
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never                                  # Do not run this job when a tag is created manually
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH  # Run this job when commits are pushed or merged to the default branch
+  script:
+    - echo "running release_job for $tagName"
+    - echo "CI_COMMIT_REF_NAME is ${CI_COMMIT_REF_NAME}"
+  release:                                         # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
+    tag_name: '$tagName'
+    description: '$tagName'
+    ref: '$CI_COMMIT_SHA'                          # The tag is created from the pipeline SHA.
+```
 #### Options
 
 **Environment Variables**
 
-- **GITHUB_TOKEN** **_(required)_** - Required for permission to tag the repo.
 - **DEFAULT_BUMP** _(optional)_ - Which type of bump to use when none explicitly provided (default: `minor`).
 - **WITH_V** _(optional)_ - Tag version with `v` character.
 - **RELEASE_BRANCHES** _(optional)_ - Comma separated list of branches (bash reg exp accepted) that will generate the release tags. Other branches and pull-requests generate versions postfixed with the commit hash and do not generate any tag. Examples: `master` or `.*` or `release.*,hotfix.*,master` ...
