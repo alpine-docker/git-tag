@@ -1,8 +1,6 @@
-# github-tag-action
+# git-tag
 
-A Github Action to automatically bump tag on main or master branch, on merge, with the latest SemVer formatted version.
-
-fork from [anothrNick/github-tag-action](https://github.com/anothrNick/github-tag-action), make it generic and focus to generate the next tag name only.
+Fork from [anothrNick/github-tag-action](https://github.com/anothrNick/github-tag-action), make it generic and focus to generate the next tag name only.
 
 This docker image can be used in any git projects, whatever it is github, gitlab, bitbucket, azure devops, and so on.
 
